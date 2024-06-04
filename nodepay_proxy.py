@@ -105,7 +105,7 @@ async def connect_socket_proxy(http_proxy,token, reconnect_interval=RETRY_INTERV
 
 async def main():
     ## add your http proxy here
-    http_proxy = [""]
+    http_proxy = "http://172.0.0.1:3124"
     await connect_socket_proxy(http_proxy, NP_TOKEN)
 
 if __name__ == '__main__':
