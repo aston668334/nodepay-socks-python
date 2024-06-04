@@ -97,6 +97,13 @@ async def connect_socket_proxy(http_proxy, token, reconnect_interval=RETRY_INTER
                         else:
                             logger.error("Failed to authenticate")
 
+        except asyncio.CancelledError:
+            logger.info("Task was cancelled")
+            break
+        except websockets.exceptions.ConnectionClosedError as e:
+            logger.error(f"Connection closed with error: {e.code} - {e.reason}")
+        except websockets.exceptions.ConnectionClosedOK:
+            logger.info("Connection closed normally")
         except Exception as e:
             logger.error(f"Connection error: {e}")
             retries += 1
@@ -122,6 +129,7 @@ async def shutdown(loop, signal=None):
 
 
 async def main():
+    ## protocol://Username:pass@ip:port
     http_proxy = ["http://172.0.0.1:3124",
                   "http://172.0.0.2:3124",
                   "http://172.0.0.3:3124"     
