@@ -104,6 +104,8 @@ async def connect_socket_proxy(http_proxy,token, reconnect_interval=RETRY_INTERV
             await asyncio.sleep(reconnect_interval / 1000)
 
 async def main():
+    ## add your http proxy here
+    http_proxy = [""]
     await connect_socket_proxy(http_proxy, NP_TOKEN)
 
 if __name__ == '__main__':
