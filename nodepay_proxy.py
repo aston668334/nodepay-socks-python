@@ -1,4 +1,5 @@
 import asyncio
+import signal
 import requests
 import json
 import time
@@ -24,8 +25,8 @@ CONNECTION_STATES = {
 NP_TOKEN = os.getenv("NP_TOKEN")
 
 headers = {
-  'Content-Type': 'application/json',
-  'Authorization': 'Bearer ' + NP_TOKEN
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + NP_TOKEN
 }
 response = requests.request("GET", "https://api.nodepay.ai/api/network/device-networks?page=0&size=10&active=false", headers=headers)
 out = json.loads(response.text)
@@ -38,11 +39,11 @@ async def call_api_info(token):
     return {
         "code": 0,
         "data": {
-            "uid": USER_ID,  # Replace with actual user ID
+            "uid": USER_ID,
         }
     }
 
-async def connect_socket_proxy(http_proxy,token, reconnect_interval=RETRY_INTERVAL, ping_interval=PING_INTERVAL):
+async def connect_socket_proxy(http_proxy, token, reconnect_interval=RETRY_INTERVAL, ping_interval=PING_INTERVAL):
     browser_id = str(uuid.uuid3(uuid.NAMESPACE_DNS, http_proxy))
     logger.info(f"Browser ID: {browser_id}")
 
@@ -62,7 +63,6 @@ async def connect_socket_proxy(http_proxy,token, reconnect_interval=RETRY_INTERV
                         **options,
                     }
                     await websocket.send(json.dumps(payload))
-
 
                 async def send_pong(guid):
                     payload = {
@@ -86,10 +86,10 @@ async def connect_socket_proxy(http_proxy,token, reconnect_interval=RETRY_INTERV
                             auth_info = {
                                 "user_id": user_info["uid"],
                                 "browser_id": browser_id,
-                                "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",  # Replace with actual user agent
+                                "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
                                 "timestamp": int(time.time()),
                                 "device_type": "extension",
-                                "version": "extension_version",  # Replace with actual version
+                                "version": "extension_version",
                                 "token": token,
                                 "origin_action": "AUTH",
                             }
@@ -103,10 +103,45 @@ async def connect_socket_proxy(http_proxy,token, reconnect_interval=RETRY_INTERV
             logger.info(f"Retrying in {reconnect_interval / 1000} seconds...")
             await asyncio.sleep(reconnect_interval / 1000)
 
+
+async def shutdown(loop, signal=None):
+    """Cleanup tasks tied to the service's shutdown."""
+    if signal:
+        logger.info(f"Received exit signal {signal.name}...")
+
+    logger.info("Napping for 3 seconds before shutdown...")
+    await asyncio.sleep(3)
+    tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+
+    logger.info(f"Cancelling {len(tasks)} outstanding tasks")
+    [task.cancel() for task in tasks]
+
+    await asyncio.gather(*tasks, return_exceptions=True)
+    logger.info("All tasks cancelled, stopping loop")
+    loop.stop()
+
+
 async def main():
-    ## add your http proxy here
-    http_proxy = "http://172.0.0.1:3124"
-    await connect_socket_proxy(http_proxy, NP_TOKEN)
+    http_proxy = ["http://172.0.0.1:3124",
+                  "http://172.0.0.2:3124",
+                  "http://172.0.0.3:3124"     
+                  ]
+
+    loop = asyncio.get_running_loop()
+    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+    for s in signals:
+        loop.add_signal_handler(s, lambda s=s: asyncio.create_task(shutdown(loop, signal=s)))
+
+    tasks = []
+    for proxy in http_proxy:
+        task = asyncio.create_task(connect_socket_proxy(proxy, NP_TOKEN))
+        tasks.append(task)
+
+    await asyncio.gather(*tasks)
+
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        logger.info("Program terminated by user.")
