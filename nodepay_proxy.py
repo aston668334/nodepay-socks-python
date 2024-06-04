@@ -1,5 +1,5 @@
-
 import asyncio
+import requests
 import json
 import time
 import uuid
@@ -21,8 +21,16 @@ CONNECTION_STATES = {
     "CLOSED": 3,
 }
 
-USER_ID = os.getenv("NODEPAY_USERID")
 NP_TOKEN = os.getenv("NP_TOKEN")
+
+headers = {
+  'Content-Type': 'application/json',
+  'Authorization': 'Bearer ' + NP_TOKEN
+}
+response = requests.request("GET", "https://api.nodepay.ai/api/network/device-networks?page=0&size=10&active=false", headers=headers)
+out = json.loads(response.text)
+USER_ID = out['data'][0]['user_id']
+
 
 async def call_api_info(token):
     # Simulate API call to get user info

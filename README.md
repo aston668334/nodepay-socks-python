@@ -12,11 +12,10 @@ cp ./.env_template ./.env
 
 ### For .env
 
-for GRASS_USERID and API_KEY
+for NP_TOKEN
 in logined grass web console run
 ```
-localStorage.getItem('accessToken');
-localStorage.getItem('userId');
+localStorage.getItem('np_token');
 ```
 
 
@@ -24,9 +23,9 @@ localStorage.getItem('userId');
 
 ```
 source ./.venv/bin/activate
-python3 ./run.py 
+python3 ./nodepay_no_proxy.py
 ```
-
+ 
 
 # Reference
 https://github.com/aron-666/Aron-vpngate-client-docker
