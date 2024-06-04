@@ -4,6 +4,7 @@ import requests
 import json
 import time
 import uuid
+import ssl
 import websockets
 from loguru import logger
 import os
@@ -13,6 +14,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 WEBSOCKET_URL = "wss://nw.nodepay.ai:4576/websocket"
+SERVER_HOSTNAME = "nw.nodepay.ai"
 RETRY_INTERVAL = 60000  # in milliseconds
 PING_INTERVAL = 10000  # in milliseconds
 CONNECTION_STATES = {
@@ -52,7 +54,15 @@ async def connect_socket_proxy(http_proxy, token, reconnect_interval=RETRY_INTER
     while True:
         try:
             proxy = Proxy.from_url(http_proxy)
-            async with proxy_connect(WEBSOCKET_URL, proxy=proxy) as websocket:
+            custom_headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+            }
+            ssl_context = ssl.create_default_context()
+            ssl_context.check_hostname = False
+            ssl_context.verify_mode = ssl.CERT_NONE
+            proxy = Proxy.from_url(http_proxy)
+            async with proxy_connect(WEBSOCKET_URL, proxy=proxy, ssl=ssl_context, server_hostname=SERVER_HOSTNAME,
+                                     extra_headers=custom_headers) as websocket:
                 logger.info("Connected to WebSocket")
                 retries = 0
             
