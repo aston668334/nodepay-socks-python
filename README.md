@@ -27,6 +27,9 @@ source ./.venv/bin/activate
 python3 ./nodepay_no_proxy.py
 ```
  
+# Referrals
+if it help you. Please use my Referrals code.
+https://app.nodepay.ai/register?ref=y8YvR3mbw5hNqX9
 
 # Reference
 https://github.com/aron-666/Aron-vpngate-client-docker
