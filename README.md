@@ -1,7 +1,8 @@
 # nodepay
 
-## usage
+Nodepay mining uses web socks for automated mining.
 
+## usage
 ### first usage 
 ```
 python3 -m venv ./.venv
