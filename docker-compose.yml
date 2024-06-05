@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  nodepay-app:
+    image: astonlee6403/nodepay-app:latest
+    environment:
+      - NP_TOKEN=your_token
+    restart: unless-stopped
