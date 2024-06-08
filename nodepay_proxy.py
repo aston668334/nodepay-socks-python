@@ -137,26 +137,31 @@ async def shutdown(loop, signal=None):
     logger.info("All tasks cancelled, stopping loop")
     loop.stop()
 
-
 async def main():
-    ## protocol://Username:pass@ip:port
-    http_proxy = ["http://172.0.0.1:3124",
-                  "http://172.0.0.2:3124",
-                  "http://172.0.0.3:3124"     
-                  ]
+    try:
+        with open('proxy-list.txt', 'r') as file:
+            http_proxy = file.readlines()
+            # Remove any leading or trailing whitespace from each line
+            http_proxy = [proxy.strip() for proxy in http_proxy if proxy.strip()]
+            if not http_proxy:
+                raise ValueError("No proxies found in proxy-list.txt")
 
-    loop = asyncio.get_running_loop()
-    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
-    for s in signals:
-        loop.add_signal_handler(s, lambda s=s: asyncio.create_task(shutdown(loop, signal=s)))
+        loop = asyncio.get_running_loop()
+        signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+        for s in signals:
+            loop.add_signal_handler(s, lambda s=s: asyncio.create_task(shutdown(loop, signal=s)))
 
-    tasks = []
-    for proxy in http_proxy:
-        task = asyncio.create_task(connect_socket_proxy(proxy, NP_TOKEN))
-        tasks.append(task)
+        tasks = []
+        for proxy in http_proxy:
+            task = asyncio.create_task(connect_socket_proxy(proxy, NP_TOKEN))
+            tasks.append(task)
 
-    await asyncio.gather(*tasks)
+        await asyncio.gather(*tasks)
 
+    except FileNotFoundError:
+        logger.error("proxy-list.txt not found. Please make sure the file exists.")
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
 
 if __name__ == '__main__':
     try:

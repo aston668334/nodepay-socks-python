@@ -1,3 +1,4 @@
 .env
 .venv/*
 docker-compose_build.yml
+proxy-list.txt
