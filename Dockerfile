@@ -7,6 +7,7 @@ WORKDIR /opt
 RUN mkdir app
 
 COPY /requirements.txt app
+COPY /proxt-list.txt app
 COPY /nodepay_proxy.py app
 COPY /nodepay_no_proxy.py app
 

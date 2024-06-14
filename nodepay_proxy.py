@@ -17,6 +17,7 @@ WEBSOCKET_URL = "wss://nw.nodepay.ai:4576/websocket"
 SERVER_HOSTNAME = "nw.nodepay.ai"
 RETRY_INTERVAL = 60000  # in milliseconds
 PING_INTERVAL = 10000  # in milliseconds
+
 CONNECTION_STATES = {
     "CONNECTING": 0,
     "OPEN": 1,
