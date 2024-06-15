@@ -31,7 +31,10 @@ python3 ./nodepay_no_proxy.py
  
 # Proxy
 This project support proxy.
-If you want to use proxy for change your IP, change http_proxy in nodepay_proxy.py
+If you want to use proxy for change your IP, add proxy in proxy-list.txt
+
+# Docker
+[dockerhub link](https://hub.docker.com/r/astonlee6403/nodepay-app)
 
 
 
