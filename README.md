@@ -4,7 +4,7 @@
 Automated mining for Nodepay.
 
 ## Theory
-Using web socks to mimic communication between nodepay extension ans nodepay server.
+Using web socks to mimic communication between nodepay extension and nodepay server.
 
 ## Usage
 ### first usage 
