@@ -1,1 +1,6 @@
 IP address:Port
+
+http://IP:PORT
+https://IP:PORT
+socks4://IP:PORT
+socks5://IP:PORT

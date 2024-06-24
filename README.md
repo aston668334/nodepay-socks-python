@@ -18,7 +18,7 @@ cp ./.env_template ./.env
 ### For .env
 
 for NP_TOKEN
-in logined grass web console run
+in logined nodepay web console run
 ```
 localStorage.getItem('np_token');
 ```
