@@ -51,7 +51,10 @@ async def connect_socket(token, reconnect_interval=RETRY_INTERVAL, ping_interval
 
     while True:
         try:
-            async with websockets.connect(WEBSOCKET_URL) as websocket:
+            custom_headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+            }
+            async with websockets.connect(WEBSOCKET_URL,extra_headers=custom_headers) as websocket:
                 logger.info("Connected to WebSocket")
                 retries = 0
 
